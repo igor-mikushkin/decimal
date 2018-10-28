@@ -905,15 +905,13 @@ func (d Decimal) Ceil() Decimal {
 
 // Truncate truncates off digits from the number, without rounding.
 //
-// NOTE: precision is the last digit that will not be truncated (must be >= 0).
-//
 // Example:
 //
 //     decimal.NewFromString("123.456").Truncate(2).String() // "123.45"
 //
 func (d Decimal) Truncate(precision int32) Decimal {
 	d.ensureInitialized()
-	if precision >= 0 && -precision > d.exp {
+	if -precision > d.exp {
 		return d.rescale(-precision)
 	}
 	return d
