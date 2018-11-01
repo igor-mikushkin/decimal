@@ -953,6 +953,7 @@ func (d Decimal) RoundToSignificantFigures(figures int32) Decimal {
 // It strips all the trailing zeros.
 // More specifically if a mantissa is representable as m*10^n it returns a decimal with a mantissa m and its exponent incremented by n.
 func (d Decimal) Normalize() Decimal {
+	d.ensureInitialized()
 	quo := big.NewInt(0).Set(d.value)
 	prevQuo := big.NewInt(0).Set(d.value)
 	rem := big.NewInt(0)
