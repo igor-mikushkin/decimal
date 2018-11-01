@@ -2620,7 +2620,12 @@ func TestNormalize(t *testing.T) {
 }
 
 func TestRoundToSignificantFigures(t *testing.T) {
-	tbl := []struct {
+	type testData struct {
+		inp Decimal
+		fig int32
+		res Decimal
+	}
+	strtbl := []struct {
 		inp string
 		fig int32
 		res string
@@ -2656,17 +2661,19 @@ func TestRoundToSignificantFigures(t *testing.T) {
 		{"0.101", 2, "0.1"},
 		{"0.101", 3, "0.101"},
 	}
-	// Symmetric negative tests
-	for i, x := range tbl {
-		if tbl[i].inp != "0" {
+	tbl := []testData{{Decimal{}, 1, Decimal{}}}
+	for _, x := range strtbl {
+		tbl = append(tbl, testData{RequireFromString(x.inp), x.fig, RequireFromString(x.res)})
+		// Symmetric negative tests
+		if x.inp != "0" {
 			x.inp = "-" + x.inp
 			x.res = "-" + x.res
-			tbl = append(tbl, x)
+			tbl = append(tbl, testData{RequireFromString(x.inp), x.fig, RequireFromString(x.res)})
 		}
 	}
-	for _, i := range tbl {
-		if rnd := RequireFromString(i.inp).RoundToSignificantFigures(i.fig); rnd.Cmp(RequireFromString(i.res)) != 0 {
-			t.Errorf("unexpected rounding to significant figures result, expected: %s, got: %v", i.res, rnd)
+	for _, x := range tbl {
+		if rnd := x.inp.RoundToSignificantFigures(x.fig); rnd.Cmp(x.res) != 0 {
+			t.Errorf("unexpected rounding to significant figures result, expected: %s, got: %v", x.res, rnd)
 		}
 	}
 }
